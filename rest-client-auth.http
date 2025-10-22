@@ -1,0 +1,262 @@
+### 🐕 REST CLIENT - CON AUTENTICACIÓN (AUTH### ===========================================
+### 2. LOGIN - OBTENER TOKENS (OBLIGATORIO)
+### ===========================================
+### ⚠️ OBLIGATORIO: Ejecuta este paso PRIMERO para obtener los tokens
+
+### Login con usuario ADMIN
+POST http://localhost:4000/api/login
+Content-Type: application/json
+
+{
+  "email": "admin@parcialoh.com",
+  "password": "admin123"
+}
+
+### Login con usuario MANAGER
+POST http://localhost:4000/api/login
+Content-Type: application/json
+
+{
+  "email": "manager@parcialoh.com",
+  "password": "manager123"
+}
+
+### Login con usuario regular
+POST http://localhost:4000/api/login
+Content-Type: application/json
+
+{
+  "email": "user@parcialoh.com",
+  "password": "user123"
+}ue)
+### Este archivo contiene ejemplos para usar cuando AUTH_ENABLED=true
+### 🔐 IMPORTANTE: Todos los endpoints requieren autenticación
+### Necesitas hacer login primero para obtener los tokens
+
+### ===========================================
+### 1. REGISTRO DE USUARIO (SIN AUTENTICACIÓN)
+### ===========================================
+### Este endpoint NO requiere autenticación
+### Puedes especificar el rol: ADMIN, USER, MODERATOR, VIEWER
+### Si no especificas rol, se asigna USER por defecto
+
+### Registro con rol USER (por defecto)
+POST http://localhost:4000/api/register
+Content-Type: application/json
+
+{
+  "name": "Juan Pérez",
+  "email": "juan.user@example.com",
+  "password": "password123"
+}
+
+### Registro con rol ADMIN
+POST http://localhost:4000/api/register
+Content-Type: application/json
+
+{
+  "name": "Admin User",
+  "email": "admin.test@example.com",
+  "password": "password123",
+  "role": "ADMIN"
+}
+
+### Registro con rol MODERATOR
+POST http://localhost:4000/api/register
+Content-Type: application/json
+
+{
+  "name": "Moderator User",
+  "email": "mod.test@example.com",
+  "password": "password123",
+  "role": "MODERATOR"
+}
+
+### ===========================================
+### 2. LOGIN - OBTENER TOKENS (OBLIGATORIO)
+### ===========================================
+### ⚠️ OBLIGATORIO: Ejecuta este paso PRIMERO para obtener los tokens
+POST http://localhost:4000/api/login
+Content-Type: application/json
+
+{
+  "email": "mod.test@example.com",
+  "password": "password123"
+}
+
+### ===========================================
+### 3. CREAR UNA RAZA (CON AUTENTICACIÓN)
+### ===========================================
+POST http://localhost:4000/api/breeds
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzYxMTUwODI4LCJleHAiOjE3NjExNTE0Mjh9.tr18SQw9dyfmmdBDlK2vcXhn9nOyMQaB2LSmDbhfzZk
+
+{
+  "name": "Husky Siberiano",
+  "description": "Perro de trabajo resistente al frío",
+  "origin_country": "Rusia",
+  "size": "LARGE",
+  "temperament": "Leal, Inteligente, Independiente",
+  "life_expectancy": 12,
+  "is_active": "ACTIVE"
+}
+
+### ===========================================
+### 4. CREAR OTRA RAZA (CON AUTENTICACIÓN)
+### ===========================================
+POST http://localhost:4000/api/breeds
+Content-Type: application/json
+Authorization: Bearer {{token}}
+x-reset-token: {{refreshToken}}
+
+{
+  "name": "Border Collie",
+  "description": "Perro de trabajo muy inteligente",
+  "origin_country": "Escocia",
+  "size": "MEDIUM",
+  "temperament": "Inteligente, Energético, Alert",
+  "life_expectancy": 13,
+  "is_active": "ACTIVE"
+}
+
+### ===========================================
+### 5. LISTAR TODAS LAS RAZAS (CON AUTENTICACIÓN)
+### ===========================================
+GET http://localhost:4000/api/breeds
+Authorization: Bearer {{token}}
+x-reset-token: {{refreshToken}}
+
+### ===========================================
+### 6. OBTENER UNA RAZA POR ID (CON AUTENTICACIÓN)
+### ===========================================
+GET http://localhost:4000/api/breeds/1
+Authorization: Bearer {{token}}
+x-reset-token: {{refreshToken}}
+
+### ===========================================
+### 7. ACTUALIZAR UNA RAZA (CON AUTENTICACIÓN)
+### ===========================================
+PUT http://localhost:4000/api/breeds/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+x-reset-token: {{refreshToken}}
+
+{
+  "description": "Descripción actualizada del Labrador",
+  "life_expectancy": 13
+}
+
+### ===========================================
+### 8. CREAR UN PERRO (CON AUTENTICACIÓN)
+### ===========================================
+POST http://localhost:4000/api/dogs
+Content-Type: application/json
+Authorization: Bearer {{token}}
+x-reset-token: {{refreshToken}}
+
+{
+  "name": "Luna",
+  "birthday": "2021-03-10",
+  "gender": "FEMALE",
+  "color": "White & Gray",
+  "weight": 25.5,
+  "value_dog": 2000.00,
+  "microchip_id": "MC9876543210",
+  "health_status": "HEALTHY",
+  "is_vaccinated": true,
+  "is_sterilized": false,
+  "owner_name": "María García",
+  "owner_phone": "+57 310 555 1234",
+  "registration_date": "2024-10-22",
+  "is_active": "ACTIVE",
+  "breed_id": 1
+}
+
+### ===========================================
+### 9. CREAR OTRO PERRO (CON AUTENTICACIÓN)
+### ===========================================
+POST http://localhost:4000/api/dogs
+Content-Type: application/json
+Authorization: Bearer {{token}}
+x-reset-token: {{refreshToken}}
+
+{
+  "name": "Max",
+  "birthday": "2020-05-15",
+  "gender": "MALE",
+  "color": "Golden",
+  "weight": 30.5,
+  "value_dog": 1500.00,
+  "microchip_id": "MC1234567890",
+  "health_status": "HEALTHY",
+  "is_vaccinated": true,
+  "is_sterilized": false,
+  "owner_name": "Juan Pérez",
+  "owner_phone": "+57 300 123 4567",
+  "registration_date": "2024-10-22",
+  "is_active": "ACTIVE",
+  "breed_id": 1
+}
+
+### ===========================================
+### 10. LISTAR TODOS LOS PERROS (CON AUTENTICACIÓN)
+### ===========================================
+GET http://localhost:4000/api/dogs
+Authorization: Bearer {{token}}
+x-reset-token: {{refreshToken}}
+
+### ===========================================
+### 11. OBTENER UN PERRO POR ID (CON AUTENTICACIÓN)
+### ===========================================
+GET http://localhost:4000/api/dogs/1
+Authorization: Bearer {{token}}
+x-reset-token: {{refreshToken}}
+
+### ===========================================
+### 12. ACTUALIZAR UN PERRO (CON AUTENTICACIÓN)
+### ===========================================
+PUT http://localhost:4000/api/dogs/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+x-reset-token: {{refreshToken}}
+
+{
+  "health_status": "IN_TREATMENT",
+  "is_vaccinated": true,
+  "weight": 32.0,
+  "owner_phone": "+57 310 555 9999"
+}
+
+### ===========================================
+### 13. ELIMINAR UN PERRO (CON AUTENTICACIÓN)
+### ===========================================
+DELETE http://localhost:4000/api/dogs/1
+Authorization: Bearer {{token}}
+x-reset-token: {{refreshToken}}
+
+### ===========================================
+### 14. ELIMINAR UNA RAZA (CON AUTENTICACIÓN)
+### ===========================================
+DELETE http://localhost:4000/api/breeds/1
+Authorization: Bearer {{token}}
+x-reset-token: {{refreshToken}}
+
+### ===========================================
+### 15. REFRESCAR TOKEN (OPCIONAL)
+### ===========================================
+POST http://localhost:4000/api/refresh-token
+Content-Type: application/json
+Authorization: Bearer {{token}}
+x-reset-token: {{refreshToken}}
+
+### ===========================================
+### INSTRUCCIONES DE USO:
+### ===========================================
+### 1. Configura AUTH_ENABLED=true en tu archivo .env
+### 2. Ejecuta el servidor: npm run dev
+### 3. 🔐 OBLIGATORIO: Ejecuta el LOGIN (paso 2) para obtener los tokens
+### 4. Copia el "token" y "refreshToken" de la respuesta del login
+### 5. Reemplaza {{token}} y {{refreshToken}} en todas las peticiones
+### 6. Solo /api/register y /api/login NO requieren autenticación
+### 7. Todos los demás endpoints (/api/breeds, /api/dogs) SÍ requieren autenticación
+### 8. Ejecuta las peticiones en orden para probar la funcionalidad completa

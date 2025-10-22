@@ -1,0 +1,100 @@
+╔══════════════════════════════════════════════════════════════════╗
+║                  QUICK START GUIDE                               ║
+║              ParcialRepeticion2_OH - Dog Management System       ║
+╚══════════════════════════════════════════════════════════════════╝
+
+📍 UBICACIÓN DEL PROYECTO
+  ~/Desktop/ParcialRepeticion2_OH/
+
+⚡ INICIO RÁPIDO (3 pasos)
+
+  1️⃣  Edita el archivo .env con tus credenciales de base de datos:
+      nano ~/Desktop/ParcialRepeticion2_OH/.env
+      
+      Configura:
+      - DB_DIALECT (postgres, mysql, mssql, oracle)
+      - Credenciales de tu BD
+      - AUTH_ENABLED (true o false)
+
+  2️⃣  Crea la base de datos 'parcial_oh_db' en tu motor
+
+  3️⃣  Inicia el servidor:
+      cd ~/Desktop/ParcialRepeticion2_OH
+      npm run dev
+
+  ✅ Servidor corriendo en http://localhost:4000
+
+📊 POBLAR CON DATOS DE PRUEBA (Opcional)
+
+  ts-node src/faker/populate_data.ts
+  
+  Crea: 3 usuarios, 3 roles, 15 razas, 50 perros
+
+🧪 PROBAR ENDPOINTS
+
+  Sin autenticación (AUTH_ENABLED=false):
+  
+  curl http://localhost:4000/api/dogs
+  curl http://localhost:4000/api/breeds
+
+  Con autenticación (AUTH_ENABLED=true):
+  
+  # Login primero
+  curl -X POST http://localhost:4000/api/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"email":"admin@parcialoh.com","password":"admin123"}'
+  
+  # Usar el token recibido
+  curl http://localhost:4000/api/dogs \
+    -H "Authorization: Bearer <tu-token>"
+
+📝 USUARIOS DE PRUEBA
+
+  Admin:    admin@parcialoh.com / admin123
+  Manager:  manager@parcialoh.com / manager123  
+  User:     user@parcialoh.com / user123
+
+📂 ARCHIVOS IMPORTANTES
+
+  README.md           → Documentación completa
+  PROJECT_SUMMARY.md  → Resumen técnico detallado
+  .env                → Variables de entorno
+  src/server.ts       → Punto de entrada
+
+🔧 COMANDOS ÚTILES
+
+  npm run dev         → Modo desarrollo
+  npm run build       → Compilar a JavaScript
+  npm install         → Instalar dependencias
+
+📚 MÁS INFORMACIÓN
+
+  Lee el README.md para documentación completa de la API,
+  estructura del proyecto y ejemplos de uso.
+
+🎯 ENDPOINTS PRINCIPALES
+
+  GET    /api/dogs          → Listar perros
+  GET    /api/dogs/:id      → Obtener perro
+  POST   /api/dogs          → Crear perro
+  PUT    /api/dogs/:id      → Actualizar perro
+  DELETE /api/dogs/:id      → Eliminar perro
+  
+  GET    /api/breeds        → Listar razas
+  GET    /api/breeds/:id    → Obtener raza
+  POST   /api/breeds        → Crear raza
+  PUT    /api/breeds/:id    → Actualizar raza
+  DELETE /api/breeds/:id    → Eliminar raza
+
+💡 TIPS
+
+  • Usa AUTH_ENABLED=false para desarrollo rápido
+  • Revisa los logs en consola para debug
+  • El servidor recrea las tablas en cada inicio (force: true)
+  • Todos los archivos de auth fueron copiados del proyecto original
+
+═══════════════════════════════════════════════════════════════════
+
+¡Proyecto listo! 🚀 ¡Éxito en tu parcial! 💪
+
+═══════════════════════════════════════════════════════════════════

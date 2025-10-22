@@ -1,0 +1,209 @@
+### 🐕 REST CLIENT - SIN AUTENTICACIÓN (AUTH_ENABLED=false)
+### Este archivo contiene ejemplos para usar cuando AUTH_ENABLED=false
+### ✅ Todos los endpoints están disponibles sin autenticación
+
+### ===========================================
+### 1. CREAR UNA RAZA (SIN AUTENTICACIÓN)
+### ===========================================
+POST http://localhost:4000/api/breeds
+Content-Type: application/json
+
+{
+  "name": "Golden Retriever",
+  "description": "Perro familiar muy amigable y leal",
+  "origin_country": "Escocia",
+  "size": "LARGE",
+  "temperament": "Amigable, Inteligente, Leal",
+  "life_expectancy": 12,
+  "is_active": "ACTIVE"
+}
+
+### ===========================================
+### 2. LISTAR TODAS LAS RAZAS (SIN AUTENTICACIÓN)
+### ===========================================
+GET http://localhost:4000/api/breeds
+
+### ===========================================
+### 3. OBTENER UNA RAZA POR ID (SIN AUTENTICACIÓN)
+### ===========================================
+GET http://localhost:4000/api/breeds/1
+
+### ===========================================
+### 4. ACTUALIZAR UNA RAZA (SIN AUTENTICACIÓN)
+### ===========================================
+PUT http://localhost:4000/api/breeds/1
+Content-Type: application/json
+
+{
+  "description": "Descripción actualizada del Golden Retriever",
+  "life_expectancy": 13,
+  "temperament": "Amigable, Inteligente, Leal, Paciente"
+}
+
+### ===========================================
+### 5. CREAR UN PERRO (SIN AUTENTICACIÓN)
+### ===========================================
+POST http://localhost:4000/api/dogs
+Content-Type: application/json
+
+{
+  "name": "Max",
+  "birthday": "2020-05-15",
+  "gender": "MALE",
+  "color": "Golden",
+  "weight": 30.5,
+  "value_dog": 1500.00,
+  "microchip_id": "MC1234567890",
+  "health_status": "HEALTHY",
+  "is_vaccinated": true,
+  "is_sterilized": false,
+  "owner_name": "Juan Pérez",
+  "owner_phone": "+57 300 123 4567",
+  "registration_date": "2024-10-22",
+  "is_active": "ACTIVE",
+  "breed_id": 1
+}
+
+### ===========================================
+### 6. LISTAR TODOS LOS PERROS (SIN AUTENTICACIÓN)
+### ===========================================
+GET http://localhost:4000/api/dogs
+
+### ===========================================
+### 7. OBTENER UN PERRO POR ID (SIN AUTENTICACIÓN)
+### ===========================================
+GET http://localhost:4000/api/dogs/1
+
+### ===========================================
+### 8. ACTUALIZAR UN PERRO (SIN AUTENTICACIÓN)
+### ===========================================
+PUT http://localhost:4000/api/dogs/1
+Content-Type: application/json
+
+{
+  "health_status": "IN_TREATMENT",
+  "is_vaccinated": true,
+  "weight": 32.0,
+  "owner_phone": "+57 300 123 9999"
+}
+
+### ===========================================
+### 9. ELIMINAR UN PERRO (SIN AUTENTICACIÓN)
+### ===========================================
+DELETE http://localhost:4000/api/dogs/1
+
+### ===========================================
+### 10. ELIMINAR UNA RAZA (SIN AUTENTICACIÓN)
+### ===========================================
+DELETE http://localhost:4000/api/breeds/1
+
+### ===========================================
+### 11. CREAR MÚLTIPLES RAZAS (SIN AUTENTICACIÓN)
+### ===========================================
+POST http://localhost:4000/api/breeds
+Content-Type: application/json
+
+{
+  "name": "Border Collie",
+  "description": "Perro de trabajo muy inteligente",
+  "origin_country": "Escocia",
+  "size": "MEDIUM",
+  "temperament": "Inteligente, Energético, Alert",
+  "life_expectancy": 13,
+  "is_active": "ACTIVE"
+}
+
+###
+
+POST http://localhost:4000/api/breeds
+Content-Type: application/json
+
+{
+  "name": "Chihuahua",
+  "description": "Perro pequeño pero con gran personalidad",
+  "origin_country": "México",
+  "size": "SMALL",
+  "temperament": "Valiente, Leal, Vivaz",
+  "life_expectancy": 15,
+  "is_active": "ACTIVE"
+}
+
+### ===========================================
+### 12. CREAR MÚLTIPLES PERROS (SIN AUTENTICACIÓN)
+### ===========================================
+POST http://localhost:4000/api/dogs
+Content-Type: application/json
+
+{
+  "name": "Luna",
+  "birthday": "2021-03-10",
+  "gender": "FEMALE",
+  "color": "White & Gray",
+  "weight": 25.5,
+  "value_dog": 2000.00,
+  "microchip_id": "MC9876543210",
+  "health_status": "HEALTHY",
+  "is_vaccinated": true,
+  "is_sterilized": false,
+  "owner_name": "María García",
+  "owner_phone": "+57 310 555 1234",
+  "registration_date": "2024-10-22",
+  "is_active": "ACTIVE",
+  "breed_id": 2
+}
+
+###
+
+POST http://localhost:4000/api/dogs
+Content-Type: application/json
+
+{
+  "name": "Rocky",
+  "birthday": "2019-08-20",
+  "gender": "MALE",
+  "color": "Brown",
+  "weight": 4.5,
+  "value_dog": 800.00,
+  "microchip_id": "MC5555555555",
+  "health_status": "HEALTHY",
+  "is_vaccinated": true,
+  "is_sterilized": true,
+  "owner_name": "Ana López",
+  "owner_phone": "+57 320 777 8888",
+  "registration_date": "2024-10-22",
+  "is_active": "ACTIVE",
+  "breed_id": 3
+}
+
+### ===========================================
+### 13. ENDPOINTS DE AUTENTICACIÓN (SIEMPRE DISPONIBLES)
+### ===========================================
+### Estos endpoints están disponibles incluso cuando AUTH_ENABLED=false
+
+### Registro de usuario
+POST http://localhost:4000/api/register
+Content-Type: application/json
+
+{
+  "name": "Usuario de Prueba",
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### Login (para obtener tokens si necesitas probar autenticación)
+POST http://localhost:4000/api/login
+Content-Type: application/json
+
+{
+  "email": "admin@parcialoh.com",
+  "password": "admin123"
+}
+
+### ===========================================
+### INSTRUCCIONES DE USO:
+### ===========================================
+### 1. Configura AUTH_ENABLED=false en tu archivo .env
+### 2. Ejecuta el servidor: npm run dev
+### 3. Ejecuta las peticiones directamente sin necesidad de autenticación
+### 4. Todas las operaciones CRUD están disponibles sin tokens
+### 5. Los endpoints de auth (register/login) siguen funcionando normalmente
