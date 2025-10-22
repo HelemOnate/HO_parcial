@@ -35,21 +35,15 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     }
     console.log(`User found in middleware: ${user.getDataValue('email')}, ID: ${user.getDataValue('id')}`);
 
-    // Validar autorización básica (verificar que el usuario tenga al menos un rol activo)
-    const userRole = await RoleUser.findOne({
-      where: { user_id: decoded.id, is_active: "ACTIVE" },
-      include: [{
-        model: Role,
-        where: { is_active: "ACTIVE" }
-      }]
-    });
-
-    if (!userRole) {
-      res.status(403).json({ error: 'Usuario sin permisos válidos.' });
+    // Validar autorización usando el sistema completo de permisos
+    console.log('About to validate authorization for user ID:', decoded.id);
+    const isAuthorized = await validateAuthorization(decoded.id, currentRoute, currentMethod);
+    if (!isAuthorized) {
+      res.status(403).json({ error: 'No está autorizado para ejecutar esta petición.' });
       return;
     }
 
-    console.log('User has valid role, proceeding...');
+    console.log('User authorized, proceeding...');
     // Continuar con la solicitud
     next();
   } catch (error: any) {
@@ -67,20 +61,29 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
 export const validateAuthorization = async (userId: number, resourcePath: string, resourceMethod: string): Promise<boolean> => {
   try {
+    console.log(`Validating authorization - User: ${userId}, Path: ${resourcePath}, Method: ${resourceMethod}`);
+    
     // Obtener todos los recursos activos que coincidan con el método
     const resources = await Resource.findAll({
       where: { method: resourceMethod, is_active: "ACTIVE" },
     });
 
+    console.log(`Found ${resources.length} resources for method ${resourceMethod}`);
+
     // Convertir las rutas dinámicas a expresiones regulares y buscar coincidencias
     const matchingResource = resources.find((resource) => {
-      const regex = pathToRegexp(resource.path).regexp.test(resourcePath);
-      return regex;
+      const regex = pathToRegexp(resource.path);
+      const match = regex.regexp.test(resourcePath);
+      console.log(`Testing path ${resource.path} against ${resourcePath}: ${match}`);
+      return match;
     });
 
     if (!matchingResource) {
+      console.log('No matching resource found');
       return false; // No hay coincidencias para la ruta y el método
     }
+
+    console.log(`Matching resource found: ${matchingResource.path} (ID: ${matchingResource.id})`);
 
     // Verificar si existe una relación válida entre el usuario, su rol y el recurso solicitado
     const resourceRole = await ResourceRole.findOne({
@@ -99,7 +102,14 @@ export const validateAuthorization = async (userId: number, resourcePath: string
       where: { resource_id: matchingResource.id, is_active: "ACTIVE" }, // Validar que la relación resource_role esté activa
     });
 
-    return !!resourceRole; // Retorna true si se encuentra un registro coincidente
+    const hasPermission = !!resourceRole;
+    console.log(`Permission check result: ${hasPermission}`);
+    
+    if (resourceRole) {
+      console.log(`User has permission - ResourceRole ID: ${resourceRole.id}`);
+    }
+
+    return hasPermission; // Retorna true si se encuentra un registro coincidente
   } catch (error) {
     console.error('Error al validar la autorización:', error);
     return false;

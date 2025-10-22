@@ -80,7 +80,7 @@ POST http://localhost:4000/api/login
 Content-Type: application/json
 
 {
-  "email": "mod.test@example.com",
+  "email": "admin.test@example.com",
   "password": "password123"
 }
 
@@ -89,7 +89,7 @@ Content-Type: application/json
 ### ===========================================
 POST http://localhost:4000/api/breeds
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzYxMTUwODI4LCJleHAiOjE3NjExNTE0Mjh9.tr18SQw9dyfmmdBDlK2vcXhn9nOyMQaB2LSmDbhfzZk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiaWF0IjoxNzYxMTUxMzA3LCJleHAiOjE3NjExNTE5MDd9.yJkGZVKaT5nuy6171ty8v9hRcowSJ9L03nwh4SeL_f8
 
 {
   "name": "Husky Siberiano",
@@ -250,13 +250,88 @@ Authorization: Bearer {{token}}
 x-reset-token: {{refreshToken}}
 
 ### ===========================================
+### 🔐 PRUEBAS DE PERMISOS POR ROLES
+### ===========================================
+### Usa estos ejemplos para probar diferentes niveles de acceso
+
+### ADMIN - Acceso completo a todo
+POST http://localhost:4000/api/login
+Content-Type: application/json
+
+{
+  "email": "admin@parcialoh.com",
+  "password": "admin123"
+}
+
+### USER - Solo CRUD de breeds/dogs (no DELETE)
+POST http://localhost:4000/api/register
+Content-Type: application/json
+
+{
+  "name": "Usuario Regular",
+  "email": "regular.user@example.com",
+  "password": "password123",
+  "role": "USER"
+}
+
+### MODERATOR - Gestión de breeds/dogs + visualización de users/roles
+POST http://localhost:4000/api/register
+Content-Type: application/json
+
+{
+  "name": "Moderador",
+  "email": "moderator@example.com",
+  "password": "password123",
+  "role": "MODERATOR"
+}
+
+### VIEWER - Solo lectura de breeds/dogs
+POST http://localhost:4000/api/register
+Content-Type: application/json
+
+{
+  "name": "Visualizador",
+  "email": "viewer@example.com",
+  "password": "password123",
+  "role": "VIEWER"
+}
+
+### ===========================================
+### MATRIZ DE PERMISOS POR ROL:
+### ===========================================
+### 
+### 📋 BREEDS (Razas):
+### • ADMIN: ✅ GET, POST, PUT, DELETE
+### • MODERATOR: ✅ GET, POST, PUT, DELETE
+### • USER: ✅ GET, POST, PUT ❌ DELETE
+### • VIEWER: ✅ GET ❌ POST, PUT, DELETE
+###
+### 🐕 DOGS (Perros):
+### • ADMIN: ✅ GET, POST, PUT, DELETE
+### • MODERATOR: ✅ GET, POST, PUT, DELETE  
+### • USER: ✅ GET, POST, PUT ❌ DELETE
+### • VIEWER: ✅ GET ❌ POST, PUT, DELETE
+###
+### 👥 USERS (Usuarios):
+### • ADMIN: ✅ GET, POST, PUT, DELETE
+### • MODERATOR: ✅ GET ❌ POST, PUT, DELETE
+### • USER: ❌ Sin acceso
+### • VIEWER: ❌ Sin acceso
+###
+### 🔐 ROLES:
+### • ADMIN: ✅ GET, POST, PUT, DELETE
+### • MODERATOR: ✅ GET ❌ POST, PUT, DELETE
+### • USER: ❌ Sin acceso  
+### • VIEWER: ❌ Sin acceso
+###
+### ===========================================
 ### INSTRUCCIONES DE USO:
 ### ===========================================
 ### 1. Configura AUTH_ENABLED=true en tu archivo .env
 ### 2. Ejecuta el servidor: npm run dev
-### 3. 🔐 OBLIGATORIO: Ejecuta el LOGIN (paso 2) para obtener los tokens
-### 4. Copia el "token" y "refreshToken" de la respuesta del login
-### 5. Reemplaza {{token}} y {{refreshToken}} en todas las peticiones
-### 6. Solo /api/register y /api/login NO requieren autenticación
-### 7. Todos los demás endpoints (/api/breeds, /api/dogs) SÍ requieren autenticación
-### 8. Ejecuta las peticiones en orden para probar la funcionalidad completa
+### 3. Los recursos y permisos se crean automáticamente al iniciar
+### 4. Registra usuarios con diferentes roles usando los ejemplos
+### 5. Haz login con cada usuario para obtener su token
+### 6. Prueba diferentes endpoints para verificar permisos
+### 7. Los usuarios sin permisos reciben error 403
+### 8. Solo /api/register y /api/login NO requieren autenticación

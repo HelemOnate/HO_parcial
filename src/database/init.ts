@@ -26,6 +26,12 @@ export async function initializeDatabase(): Promise<void> {
     // Create default roles
     await createDefaultRoles();
     
+    // Create default resources and permissions
+    await createDefaultResources();
+    
+    // Assign permissions to roles
+    await assignRolePermissions();
+    
     // Create default admin user
     await createDefaultUser();
     
@@ -63,6 +69,157 @@ async function createDefaultRoles(): Promise<void> {
   }
 }
 
+async function createDefaultResources(): Promise<void> {
+  try {
+    const resources = [
+      // Breed resources
+      { path: '/api/breeds', method: 'GET', description: 'Listar todas las razas' },
+      { path: '/api/breeds/:id', method: 'GET', description: 'Obtener raza por ID' },
+      { path: '/api/breeds', method: 'POST', description: 'Crear nueva raza' },
+      { path: '/api/breeds/:id', method: 'PUT', description: 'Actualizar raza' },
+      { path: '/api/breeds/:id', method: 'DELETE', description: 'Eliminar raza' },
+      
+      // Dog resources
+      { path: '/api/dogs', method: 'GET', description: 'Listar todos los perros' },
+      { path: '/api/dogs/:id', method: 'GET', description: 'Obtener perro por ID' },
+      { path: '/api/dogs', method: 'POST', description: 'Crear nuevo perro' },
+      { path: '/api/dogs/:id', method: 'PUT', description: 'Actualizar perro' },
+      { path: '/api/dogs/:id', method: 'DELETE', description: 'Eliminar perro' },
+      
+      // User management resources
+      { path: '/api/users', method: 'GET', description: 'Listar todos los usuarios' },
+      { path: '/api/users/:id', method: 'GET', description: 'Obtener usuario por ID' },
+      { path: '/api/users/:id', method: 'PUT', description: 'Actualizar usuario' },
+      { path: '/api/users/:id', method: 'DELETE', description: 'Eliminar usuario' },
+      
+      // Role management resources
+      { path: '/api/roles', method: 'GET', description: 'Listar todos los roles' },
+      { path: '/api/roles', method: 'POST', description: 'Crear nuevo rol' },
+      { path: '/api/roles/:id', method: 'PUT', description: 'Actualizar rol' },
+      { path: '/api/roles/:id', method: 'DELETE', description: 'Eliminar rol' }
+    ];
+
+    for (const resourceData of resources) {
+      const existingResource = await Resource.findOne({ 
+        where: { 
+          path: resourceData.path, 
+          method: resourceData.method 
+        } 
+      });
+      
+      if (!existingResource) {
+        await Resource.create({
+          path: resourceData.path,
+          method: resourceData.method,
+          description: resourceData.description,
+          is_active: 'ACTIVE'
+        });
+        console.log(`🔒 Resource created: ${resourceData.method} ${resourceData.path}`);
+      }
+    }
+  } catch (error) {
+    console.error('❌ Error creating default resources:', error);
+  }
+}
+
+async function assignRolePermissions(): Promise<void> {
+  try {
+    // Get all roles and resources
+    const adminRole = await Role.findOne({ where: { name: 'ADMIN' } });
+    const moderatorRole = await Role.findOne({ where: { name: 'MODERATOR' } });
+    const userRole = await Role.findOne({ where: { name: 'USER' } });
+    const viewerRole = await Role.findOne({ where: { name: 'VIEWER' } });
+
+    const allResources = await Resource.findAll();
+
+    if (adminRole) {
+      // ADMIN: Acceso completo a todo
+      for (const resource of allResources) {
+        const exists = await ResourceRole.findOne({
+          where: { role_id: adminRole.id, resource_id: resource.id }
+        });
+        if (!exists) {
+          await ResourceRole.create({
+            role_id: adminRole.id,
+            resource_id: resource.id,
+            is_active: 'ACTIVE'
+          });
+        }
+      }
+      console.log('🔐 ADMIN permissions: Full access to all resources');
+    }
+
+    if (moderatorRole) {
+      // MODERATOR: Puede leer todo, crear/actualizar breeds y dogs, no puede eliminar usuarios ni roles
+      const moderatorPermissions = allResources.filter(r => 
+        !r.path.includes('/api/users') && !r.path.includes('/api/roles') || 
+        (r.path.includes('/api/users') && r.method === 'GET') ||
+        (r.path.includes('/api/roles') && r.method === 'GET')
+      );
+      
+      for (const resource of moderatorPermissions) {
+        const exists = await ResourceRole.findOne({
+          where: { role_id: moderatorRole.id, resource_id: resource.id }
+        });
+        if (!exists) {
+          await ResourceRole.create({
+            role_id: moderatorRole.id,
+            resource_id: resource.id,
+            is_active: 'ACTIVE'
+          });
+        }
+      }
+      console.log('🔐 MODERATOR permissions: Manage breeds/dogs, view users/roles');
+    }
+
+    if (userRole) {
+      // USER: Puede leer y crear breeds/dogs, no puede eliminar ni gestionar usuarios/roles
+      const userPermissions = allResources.filter(r => 
+        (r.path.includes('/api/breeds') || r.path.includes('/api/dogs')) && 
+        (r.method === 'GET' || r.method === 'POST' || r.method === 'PUT')
+      );
+      
+      for (const resource of userPermissions) {
+        const exists = await ResourceRole.findOne({
+          where: { role_id: userRole.id, resource_id: resource.id }
+        });
+        if (!exists) {
+          await ResourceRole.create({
+            role_id: userRole.id,
+            resource_id: resource.id,
+            is_active: 'ACTIVE'
+          });
+        }
+      }
+      console.log('🔐 USER permissions: Create/read/update breeds and dogs');
+    }
+
+    if (viewerRole) {
+      // VIEWER: Solo lectura de breeds y dogs
+      const viewerPermissions = allResources.filter(r => 
+        (r.path.includes('/api/breeds') || r.path.includes('/api/dogs')) && 
+        r.method === 'GET'
+      );
+      
+      for (const resource of viewerPermissions) {
+        const exists = await ResourceRole.findOne({
+          where: { role_id: viewerRole.id, resource_id: resource.id }
+        });
+        if (!exists) {
+          await ResourceRole.create({
+            role_id: viewerRole.id,
+            resource_id: resource.id,
+            is_active: 'ACTIVE'
+          });
+        }
+      }
+      console.log('🔐 VIEWER permissions: Read-only access to breeds and dogs');
+    }
+  } catch (error) {
+    console.error('❌ Error assigning role permissions:', error);
+  }
+}
+
 async function createDefaultUser(): Promise<void> {
   try {
     // Check if admin user already exists
@@ -77,6 +234,16 @@ async function createDefaultUser(): Promise<void> {
         is_active: 'ACTIVE',
         avatar: null
       });
+      
+      // Assign ADMIN role to the admin user
+      const adminRole = await Role.findOne({ where: { name: 'ADMIN' } });
+      if (adminRole) {
+        await RoleUser.create({
+          user_id: adminUser.id,
+          role_id: adminRole.id,
+          is_active: 'ACTIVE'
+        });
+      }
       
       console.log('👤 Default admin user created:', adminUser.email);
     } else {
